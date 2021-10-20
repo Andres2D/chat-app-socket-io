@@ -1,10 +1,41 @@
+const myForm = document.querySelector('form');
+
+const url = 'http://localhost:8080/api/auth';
+
+myForm.addEventListener('submit', event => {
+    event.preventDefault();
+    const formData = {};
+
+    for(let el of myForm.elements) {
+        if(el.name.length > 0)
+            formData[el.name] = el.value
+    }
+
+    fetch(`${url}/login` ,{
+        method: 'POST',
+        body: JSON.stringify( formData ),
+        headers: { 'Content-Type': 'application/json'}
+    })
+    .then(resp => resp.json())
+    .then(({ok, msg, token}) => {
+        if(!ok) {
+            return console.error(msg);
+        }
+
+        localStorage.setItem('token', token);
+    })
+    .catch( err => {
+        console.log(err);
+    })
+})
+
 function handleCredentialResponse(response) {
     //Google token: ID_TOKEN
    const body = {
        id_token: response.credential
     };
 
-   fetch('http://localhost:8080/api/auth/google', {
+   fetch(`${url}/google`, {
        method: 'POST',
        headers: {
            'Content-Type': 'application/json'
@@ -15,7 +46,6 @@ function handleCredentialResponse(response) {
         .then(({user, token}) => {
             localStorage.setItem('email', user.email);
             localStorage.setItem('token', token);
-            console.log(token);
         })
         .catch(console.warn);
 }
