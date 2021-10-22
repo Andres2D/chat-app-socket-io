@@ -15,6 +15,7 @@ class ChatMessages {
 
     get lastMessages() {
         this.messages = this.messages.splice(0,10);
+        console.log(this.messages);
         return this.messages;
     }
 

@@ -3,7 +3,7 @@
 const txtUid = document.querySelector('#txtUid');
 const txtMessage = document.querySelector('#txtMessage');
 const ulUsers = document.querySelector('#ulUsers');
-const UlMessages = document.querySelector('#UlMessages');
+const ulMessages = document.querySelector('#ulMessages');
 const btnLogout = document.querySelector('#btnLogout');
 
 let user = null;
@@ -46,9 +46,7 @@ const connectSocket = async() => {
         console.log('Sockets offline');
     });
 
-    socket.on('receive-messages', () => {
-
-    });
+    socket.on('receive-messages', renderMessages);
 
     socket.on('active-users', renderUser);
 
@@ -73,6 +71,35 @@ const renderUser = (users = []) => {
     });
     ulUsers.innerHTML = usersHTML;
 }
+
+const renderMessages = (messages = []) => {
+
+    let chatHTML = '';
+    messages.forEach(({name, message}) => {
+        chatHTML += `
+        <li>
+            <p>
+                <span class="text-primary">${name}</span>
+                <span class="fs-6 text-muted">${message}</span>
+                </p>
+        </li>
+        `
+    });
+    ulMessages.innerHTML = chatHTML;
+}
+
+
+txtMessage.addEventListener('keyup', ({keyCode}) => {
+    
+    const message = txtMessage.value;
+    const uid = txtUid.value;
+    if(keyCode !== 13) {return;}
+    if(message.length === 0){return;}
+
+    socket.emit('send-message', {message, uid});    
+    txtMessage.value = '';
+
+});
 
 const main = async() => {
 
