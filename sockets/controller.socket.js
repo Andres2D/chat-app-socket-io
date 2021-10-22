@@ -23,12 +23,19 @@ const socketController = async(socket = new Socket(), io) => {
             io.emit('active-users', chatMessages.usersArr);
         });
 
-        socket.on('send-message', ({uid, message}) => {
-            
-            chatMessages.sendMessage(user.id, user.name, message);
-            io.emit('receive-messages', chatMessages.lastMessages);
+        //Connect to special room
+        socket.join(user.id); // 
 
-        })
+        socket.on('send-message', ({uid, message}) => {
+
+            if(uid) {
+                //private message
+                socket.to(uid).emit('private-message', { from: user.name, message })
+            } else{
+                chatMessages.sendMessage(user.id, user.name, message);
+                io.emit('receive-messages', chatMessages.lastMessages);
+            }
+        });
 
     }catch(err) {
         return socket.disconnect();

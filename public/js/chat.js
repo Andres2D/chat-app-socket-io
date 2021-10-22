@@ -50,8 +50,8 @@ const connectSocket = async() => {
 
     socket.on('active-users', renderUser);
 
-    socket.on('private-message', () => {
-
+    socket.on('private-message', (payload) => {
+        console.log('private ', payload );
     });
 
 }
